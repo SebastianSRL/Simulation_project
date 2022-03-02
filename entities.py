@@ -44,6 +44,15 @@ class Player:
         self.money += amount
         self.earned += amount
 
+    def movement(self, move, board_size):
+        if self.position + move >= board_size:  # Altera la posicion del jugador teniendo en cuenta si ya va a dar una vuelta o no
+            move = move - (board_size - self.position)
+            self.position = move
+            self.go_counter += 1  # Contador de vuetas al tablero
+            # self.earn(5)  # Da x cantidad en cada vuelta al tablero
+        else:
+            self.position += move
+
     def turn(self, move, board, players):
         """
         Initialize a player given the name and the initial money.
@@ -61,23 +70,16 @@ class Player:
             # ================ #
             #     Movement     #
             # ================ #
-
-            if self.position + move >= board_size:  # Altera la posicion del jugador teniendo en cuenta si ya va a dar una vuelta o no
-                move = move - (board_size - self.position)
-                self.position = move
-                self.go_counter += 1  # Contador de vuetas al tablero
-                # self.earn(5)  # Da x cantidad en cada vuelta al tablero
-            else:
-                self.position += move
+            self.movement(move, board_size)
 
             standing = board[self.position - 1]  # Propiedad sobre la cual ahora se encuentra situado el jugador
 
             # ================ #
             #    Behaviour     #
             # ================ #
-
-            if standing.get_name() == 'GO':  # Si pasa por la salida no hace nada a simple vista
-                pass  # El dinero por darle la vuelta al tablero se añade en otra parte
+            # Si pasa por la salida o parada libre no hace nada (El dinero se añade en la función turn)
+            if standing.get_name() == 'GO' or standing.get_name() == 'Free Parking':
+                pass
             elif standing.get_name() == 'Jail':
                 self.jail()  # Si cae en la carce lo hace perder un turno
             else:
